@@ -1,24 +1,29 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import Link from 'next/link'
-import LogoutButton from '../components/LogoutButton'
-import SupabaseLogo from '../components/SupabaseLogo'
-import NextJsLogo from '../components/NextJsLogo'
-import Editor from '@/components/editor'
+"use client"
+
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useState } from 'react'
 
 export const dynamic = 'force-dynamic'
 
+export default function Home() {
+  const supabase = createClientComponentClient()
+  const [text, setText] = useState("")
+  const handleTextChange = (event: any) => {
+    setText(event.target.value)
+  }
 
-export default async function Index() {
-  const supabase = createServerComponentClient({ cookies })
+  const updateOrCreatePost = async () => {
+    const { error } = await supabase
+      .from("text")
+      .insert({ "content": text })
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    console.log("error creating new text", error)
+  }
 
   return (
     <div className="flex h-screen flex-col items-center justify-between p-8 bg-[#FCF6E5]">
-      <textarea className="w-1/2 h-full border-none outline-none bg-transparent resize-none" autoFocus></textarea>
+      <textarea className="w-1/2  border-none outline-none bg-transparent resize-none" autoFocus value={text} onChange={handleTextChange}></textarea>
+      <button onClick={updateOrCreatePost}>Create</button>
     </div>
   )
 }
