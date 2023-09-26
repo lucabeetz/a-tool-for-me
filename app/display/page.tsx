@@ -1,11 +1,11 @@
 "use client"
 
+import Link from "next/link"
 import { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default function Display() {
   const [posts, setPosts] = useState([])
-  const [user, setUser] = useState(null)
   const supabase = createClientComponentClient()
 
   useEffect(() => {
@@ -45,14 +45,15 @@ export default function Display() {
     updateTexts()
   }, [])
 
-  const numbers = Array.from({ length: 15 }, (_, i) => i);
-
   return (
     <div className="w-screen mx-auto h-screen bg-[#FCF6E5] p-4">
       <div className="grid grid-cols-5 gap-4">
         {posts.map((post, index) => (
-          <div key={index} className="w-full h-0 pb-full bg-blue-300" style={{ backgroundImage: `url('${post.image}')`, backgroundSize: 'cover' }}></div>
+          <Link key={index} href={`/text/${post.id}`}>
+            <div key={index} className="w-full h-0 pb-full bg-blue-300 cursor-pointer" style={{ backgroundImage: `url('${post.image}')`, backgroundSize: 'cover' }}></div>
+          </Link>
         ))}
+        <div className="border border-dashed border-slate-400 w-full h-0 pb-full cursor-pointer border-inline"></div>
       </div>
     </div>
   )
