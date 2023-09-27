@@ -1,29 +1,41 @@
-"use client"
+import Link from "next/link"
+import { cookies } from 'next/headers'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { useState } from 'react'
+export default async function Display() {
+  const supabase = createServerComponentClient({ cookies })
 
-export const dynamic = 'force-dynamic'
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
 
-export default function Home() {
-  const supabase = createClientComponentClient()
-  const [text, setText] = useState("")
-  const handleTextChange = (event: any) => {
-    setText(event.target.value)
+  const { data, error } = await supabase
+    .from("text")
+    .select()
+
+  if (error) {
+    console.log("error getting texts", error)
+    return
   }
 
-  const updateOrCreatePost = async () => {
-    const { error } = await supabase
-      .from("text")
-      .insert({ "content": text })
+  for (const post of data) {
+    const res = await supabase
+      .storage
+      .from('images')
+      .getPublicUrl(`public/${post.id}.png`)
 
-    console.log("error creating new text", error)
+    post.image = res.data.publicUrl
   }
 
   return (
-    <div className="flex h-screen flex-col items-center justify-between p-8 bg-[#FCF6E5]">
-      <textarea className="w-1/2  border-none outline-none bg-transparent resize-none" autoFocus value={text} onChange={handleTextChange}></textarea>
-      <button onClick={updateOrCreatePost}>Create</button>
+    <div className="w-screen mx-auto h-screen bg-[#FCF6E5] p-4">
+      <div className="grid grid-cols-5 gap-4">
+        {data.map((post, index) => (
+          <Link key={index} href={`/text/${post.id}`}>
+            <div key={index} className="w-full h-0 pb-full bg-blue-300 cursor-pointer" style={{ backgroundImage: `url('${post.image}')`, backgroundSize: 'cover' }}></div>
+          </Link>
+        ))}
+        <Link href="/new" className="border border-dashed border-slate-400 w-full h-0 pb-full cursor-pointer border-inline"></Link>
+      </div>
     </div>
   )
 }
