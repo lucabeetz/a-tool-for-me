@@ -22,7 +22,7 @@ export default function Home() {
 
   return (
     <div className="flex h-screen flex-col items-center justify-between p-8 bg-[#FCF6E5]">
-      <textarea className="w-1/2  border-none outline-none bg-transparent resize-none" autoFocus value={text} onChange={handleTextChange}></textarea>
+      <textarea className="w-1/2 h-full border-none outline-none bg-transparent resize-none" autoFocus value={text} onChange={handleTextChange}></textarea>
       <button onClick={updateOrCreatePost}>Save</button>
     </div>
   )
