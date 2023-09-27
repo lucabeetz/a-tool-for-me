@@ -12,8 +12,6 @@ export default async function Display() {
     .from("text")
     .select()
 
-  console.log(user)
-
   if (error) {
     console.log("error getting texts", error)
     return
